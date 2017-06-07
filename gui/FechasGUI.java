@@ -105,12 +105,6 @@ public class FechasGUI extends JDialog implements Serializable {
 		txtfldTiempoTranscurrido.setToolTipText(
 				"Muestra el per\u00EDodo transcurrido en d\u00EDas, meses o a\u00F1os, en funci\u00F3n de la opci\u00F3n escogida");
 		txtfldTiempoTranscurrido.setEditable(false);
-//		try {
-//			txtfldTiempoTranscurrido.setText(PERIODO
-//					+ obtenerPeriodoAnnos(obtenerFechaSpinner(spinnerInicial), obtenerFechaSpinner(spinnerFinal)));
-//		} catch (FechaNoValidaException e2) {
-//			e2.getMessage();
-//		}
 		txtfldTiempoTranscurrido.setBounds(169, 32, 197, 20);
 		contentPanel.add(txtfldTiempoTranscurrido);
 		txtfldTiempoTranscurrido.setColumns(10);
