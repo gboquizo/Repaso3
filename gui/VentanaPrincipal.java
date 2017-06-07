@@ -309,7 +309,7 @@ public class VentanaPrincipal extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
-				salir();
+				guardarSiModificado();
 			}
 		});
 	}
@@ -326,11 +326,22 @@ public class VentanaPrincipal extends JFrame {
 	 * Método que comprueba si existen cambios sin guardar antes de salir
 	 */
 	private void guardarSiModificado() {
-		if (FechasGUI.isModificado() == true && !cambiosGuardados) {
-			int opcion = JOptionPane.showConfirmDialog(contentPane,
-					"Existen cambios sin guardar, ¿Desea guardar ahora?", "Fecha", JOptionPane.YES_NO_OPTION);
-			if (opcion == JOptionPane.YES_OPTION)
-				guardar();
+		if(FechasGUI.isModificado() == true && !cambiosGuardados){
+			int opcion =JOptionPane.showConfirmDialog(contentPane, "Hay cambios sin guardar ¿Quieres guardarlos?","Fecha",JOptionPane.YES_NO_CANCEL_OPTION);
+				switch(opcion){
+					case JOptionPane.YES_OPTION:
+						 guardar();
+						 System.exit(0);
+					case JOptionPane.NO_OPTION:
+						System.exit(0);
+					default:
+						VentanaPrincipal principal = new VentanaPrincipal();
+						principal.setTitle(SIN_TITULO);
+						principal.setVisible(true);
+				}
+					
+				
+					
 		}
 	}
 }
