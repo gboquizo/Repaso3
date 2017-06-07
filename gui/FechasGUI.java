@@ -115,6 +115,7 @@ public class FechasGUI extends JDialog implements Serializable {
 		contentPanel.add(txtfldTiempoTranscurrido);
 		txtfldTiempoTranscurrido.setColumns(10);
 
+		
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.WHITE);
 		panel.setToolTipText("Escoge una fecha");
@@ -173,7 +174,7 @@ public class FechasGUI extends JDialog implements Serializable {
 			buttonGroup.add(rdbtnAnnos);
 		}
 
-		rdbtnAnnos.setSelected(true);
+		
 
 		spinnerInicial = new JSpinner();
 		spinnerInicial.setForeground(Color.WHITE);
@@ -235,6 +236,8 @@ public class FechasGUI extends JDialog implements Serializable {
 		buttonSalir.setToolTipText("Pulsar para salir");
 		buttonSalir.setActionCommand("OK");
 
+		rdbtnAnnos.setSelected(true);
+		txtfldTiempoTranscurrido.setText(obtenerPeriodoAnnos(getFechaSpinnerInicial(), getFechaSpinnerFinal()));
 	}
 
 	/**
