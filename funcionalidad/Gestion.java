@@ -1,68 +1,72 @@
 package funcionalidad;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import gui.FechasGUI;
 
 /**
- * Clase de gestion de ficheros
+ * Clase de gestion
  * 
  * @author Guillermo Boquizo Sánchez
- * @version 1.0
+ * @version 2.0
  *
  */
 public class Gestion {
 
-	static File file = new File("Sin Nombre.txt");
+	private static File fichero;
+	private static boolean modificado = false;
+	private static ArrayList<String> lineas = new ArrayList<String>();
+	
+	public static void add(LocalDate fechaInicial, LocalDate fechaFinal, String JTextField) {
+		generarLinea(fechaInicial, fechaFinal, JTextField);
+		setModificado(true);
+	}
 
-	/**
-	 * Guarda los datos en un fichero
-	 * 
-	 * @throws ErrorAlEscribirException
-	 */
+	private static void generarLinea(LocalDate fechaInicial,LocalDate fechaFinal,String JTextField) {
+		String linea = "Fecha inicio : " + fechaInicial.toString() + "\tFecha fin : " + fechaFinal.toString() + "\t"
+				+ JTextField;
+		lineas.add(linea + "\n");
+		setModificado(true);
+	}
+
+	public static void nuevo() {
+		setModificado(false);
+		setFile(null);
+		lineas = new ArrayList<String>();
+	}
+
+	public static ArrayList<String> abrir(File selectedFile) throws ErrorAlLeerException {
+		ArrayList<String>  lectura = Fichero.leer(selectedFile);
+		setModificado(false);
+		setFile(selectedFile);
+		return lectura;
+	}
+
+	
+
 	public static void guardar() throws ErrorAlEscribirException {
-		Fichero.escritura(file, FechasGUI.getFechaSpinnerInicial(), FechasGUI.obtenerPeriodo(),
-				FechasGUI.getFechaSpinnerFinal());
+		Fichero.escribir(fichero,lineas);
+		setModificado(false);
 	}
 
-	/**
-	 * Devuelve los datos leidos de un fichero
-	 * 
-	 * @param file
-	 * @return
-	 * @throws ErrorAlLeerException
-	 */
-	public static ArrayList<String> abrir(File file) throws ErrorAlLeerException {
-		return Fichero.leer(file);
+	public static void guardar(File file) throws ErrorAlEscribirException {
+		Fichero.escribir(file,lineas);
+		setModificado(false);
 	}
 
-	/**
-	 * Asigna un fichero al file principal
-	 * 
-	 * @param fichero
-	 */
-	public static void setFile(File fichero) {
-		file = fichero;
+	public static boolean isModificado() {
+		return modificado;
 	}
 
-	/**
-	 * Comprueba si el fichero existe
-	 * 
-	 * @param file
-	 * @return boolean
-	 */
-	public static boolean ficheroExiste(File file) {
-		if (file.exists())
-			return true;
-		return false;
+	private static void setModificado(boolean modificado) {
+		Gestion.modificado = modificado;
 	}
 
-	/**
-	 * Devuelve el fichero
-	 * 
-	 * @return file
-	 */
+	private static void setFile(File fichero) {
+		Gestion.fichero = fichero;
+	}
+
 	public static File getFile() {
-		return file;
+		return fichero;
 	}
 }

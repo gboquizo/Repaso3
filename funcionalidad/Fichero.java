@@ -7,59 +7,37 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Fichero {
-
-	private static ArrayList<String> lineas = new ArrayList<String>();
+/**
+ * Clase de control de ficheros
+ * 
+ * @author Guillermo Boquizo Sánchez
+ * @version 2.0
+ *
+ */
+public class Fichero implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Metodo que permite la escritura de los parametros indicados en un archivo
 	 * 
 	 * @param fichero,
 	 *            archivo en el que se escribe
-	 * @param fechaInicial,
-	 *            la fecha inicial
-	 * @param JTextField,
-	 *            campo de texto donde se muestra el calculo del Period
-	 * @param fechaFinal,
-	 *            la fecha final
+	 * @param lineas
+	 *            Arraylist de lineas donde se han escrito
 	 * @throws ErrorAlEscribirException
 	 */
-	public static void escritura(File fichero, LocalDate fechaInicial, String JTextField, LocalDate fechaFinal)
-			throws ErrorAlEscribirException {
-
-		try {
-			fichero = annadirExtension(fichero);
-			FileWriter out = new FileWriter(fichero);
-			BufferedWriter bw = new BufferedWriter(out);
-
-			for (String linea : lineas) {
+	public static void escribir(File fichero, ArrayList<String> lineas) throws ErrorAlEscribirException {
+		fichero = annadirExtension(fichero);
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(fichero))) {
+			for (String linea : lineas) 
 				bw.write(linea + "\n");
-			}
-
-			bw.close();
-
+			
 		} catch (IOException e) {
 			throw new ErrorAlEscribirException("Error de escritura");
 		}
-	}
-
-	/**
-	 * Método que permite escribir la fecha en forma de línea en el archivo
-	 * 
-	 * @param fechaInicial,
-	 *            la fecha inicial obtenida del spinner
-	 * @param JTextField,
-	 *            el valor del período mostrado en el JTextField correspondiente
-	 * @param fechaFinal,
-	 *            la fecha final obtenida del spinner
-	 */
-	public static void escribirLinea(LocalDate fechaInicial, String JTextField, LocalDate fechaFinal) {
-		String linea = "Fecha inicio : " + fechaInicial.toString() + ", Fecha fin : " + fechaFinal.toString() + ", "
-				+ JTextField;
-		lineas.add(linea + "\n");
 	}
 
 	/**

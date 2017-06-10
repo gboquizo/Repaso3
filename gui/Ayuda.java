@@ -14,6 +14,7 @@ import javax.swing.border.BevelBorder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+
 /**
  * Clase para la ventana GUI de ayuda
  * 
@@ -35,6 +36,7 @@ public class Ayuda extends JDialog {
 	 * Create the dialog.
 	 */
 	private Ayuda() {
+		setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 		setBackground(new Color(102, 204, 255));
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Ayuda.class.getResource("/resources/favicon.png")));
 		setResizable(false);
