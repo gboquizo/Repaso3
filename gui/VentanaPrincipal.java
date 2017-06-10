@@ -12,13 +12,14 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 import funcionalidad.*;
+import funcionalidad.excepciones.ErrorAlEscribirException;
+import funcionalidad.excepciones.ErrorAlLeerException;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
-import javax.swing.JTextPane;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -30,12 +31,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.awt.event.InputEvent;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /**
  * Clase para la ventana principal
  * 
- * @author Guillermo Boquizo Sánchez
- * @version 1.0
+ * @author Guillermo Boquizo Sanchez
+ * @version 2.0
  *
  */
 public class VentanaPrincipal extends JFrame {
@@ -44,7 +46,7 @@ public class VentanaPrincipal extends JFrame {
 	private static JFileChooser jfilechooser = new JFileChooser();
 	static FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivo de texto", "txt");
 	private JPanel contentPane;
-	private JTextPane textPane;
+	private JTextArea textPane;
 	static {
 		jfilechooser.setFileFilter(filter);
 	}
@@ -75,7 +77,7 @@ public class VentanaPrincipal extends JFrame {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setIconImage(
 				Toolkit.getDefaultToolkit().getImage(VentanaPrincipal.class.getResource("/resources/favicon.png")));
-		setBounds(100, 100, 481, 325);
+		setBounds(100, 100, 524, 347);
 		controlarSalida();
 
 		JMenuBar menuBar = new JMenuBar();
@@ -217,28 +219,15 @@ public class VentanaPrincipal extends JFrame {
 		setContentPane(contentPane);
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(0, 0, 475, 275);
+		scrollPane.setBounds(0, 0, 518, 297);
 		contentPane.add(scrollPane);
 
-		textPane = new JTextPane();
-		scrollPane.setViewportView(textPane);
+		textPane = new JTextArea();
 		textPane.setEditable(false);
+		scrollPane.setViewportView(textPane);
 		textPane.setForeground(Color.BLACK);
 		textPane.setBackground(Color.WHITE);
 
-	}
-
-	private ContinuarAbortar guardar() {
-		try {
-			if (Gestion.getFile() == null) {
-				return guardarComo();
-			}
-			Gestion.guardar();
-			return ContinuarAbortar.CONTINUAR;
-		} catch (ErrorAlEscribirException e) {
-			JOptionPane.showMessageDialog(contentPane, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			return ContinuarAbortar.ABORTAR;
-		}
 	}
 
 	/**
@@ -250,9 +239,13 @@ public class VentanaPrincipal extends JFrame {
 		}
 		Gestion.nuevo();
 		actualizarTitulo();
+		textPane.setText(null);
 
 	}
-
+	
+	/**
+	 * Metodo encargado de actualizar el titulo
+	 */
 	private void actualizarTitulo() {
 		if (Gestion.getFile() == null)
 			setTitle(SIN_TITULO);
@@ -261,7 +254,7 @@ public class VentanaPrincipal extends JFrame {
 	}
 
 	/**
-	 * Lee el fichero y vuelca su contenido en un textPane
+	 * Lee el fichero y vuelca su contenido en un textArea
 	 */
 	private ContinuarAbortar abrir() {
 		if (jfilechooser.showOpenDialog(contentPane) != JFileChooser.APPROVE_OPTION) {
@@ -285,6 +278,22 @@ public class VentanaPrincipal extends JFrame {
 		return ContinuarAbortar.ABORTAR;
 	}
 
+	/**
+	 * Guarda los datos en un fichero
+	 */
+	private ContinuarAbortar guardar() {
+		try {
+			if (Gestion.getFile() == null) {
+				return guardarComo();
+			}
+			Gestion.guardar();
+			return ContinuarAbortar.CONTINUAR;
+		} catch (ErrorAlEscribirException e) {
+			JOptionPane.showMessageDialog(contentPane, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			return ContinuarAbortar.ABORTAR;
+		}
+	}
+	
 	/**
 	 * Guarda los datos en un fichero, si hay modificaciones
 	 */
@@ -312,6 +321,25 @@ public class VentanaPrincipal extends JFrame {
 		} while (true);
 	}
 
+	
+	/**
+	 * Metodo que comprueba si existen cambios sin guardar antes de salir
+	 */
+	private ContinuarAbortar guardarSiModificado() {
+		if (Gestion.isModificado()) {
+			int opcion = JOptionPane.showConfirmDialog(contentPane, "Hay cambios sin guardar ¿Quieres guardarlos?",
+					"Fecha", JOptionPane.YES_NO_CANCEL_OPTION);
+			switch (opcion) {
+			case JOptionPane.YES_OPTION:
+				return guardarComo();
+			case JOptionPane.NO_OPTION:
+				break;
+			default:
+				return ContinuarAbortar.ABORTAR;
+			}
+		}
+		return ContinuarAbortar.CONTINUAR;
+	}
 	
 	/**
 	 * Indica si se desea reemplazar el fichero existente en caso de existir
@@ -348,29 +376,13 @@ public class VentanaPrincipal extends JFrame {
 			}
 		});
 	}
-
+	
+	/**
+	 * Metodo encargado de controlar la salida del programa
+	 */
 	private void salir() {
 		if (guardarSiModificado() == ContinuarAbortar.ABORTAR)
 			return;
 		System.exit(0);
-	}
-
-	/**
-	 * Método que comprueba si existen cambios sin guardar antes de salir
-	 */
-	private ContinuarAbortar guardarSiModificado() {
-		if (Gestion.isModificado()) {
-			int opcion = JOptionPane.showConfirmDialog(contentPane, "Hay cambios sin guardar ¿Quieres guardarlos?",
-					"Fecha", JOptionPane.YES_NO_CANCEL_OPTION);
-			switch (opcion) {
-			case JOptionPane.YES_OPTION:
-				return guardarComo();
-			case JOptionPane.NO_OPTION:
-				break;
-			default:
-				return ContinuarAbortar.ABORTAR;
-			}
-		}
-		return ContinuarAbortar.CONTINUAR;
 	}
 }

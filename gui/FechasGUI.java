@@ -23,26 +23,25 @@ import javax.swing.JSpinner;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
-import funcionalidad.FechaNoValidaException;
 import funcionalidad.Gestion;
+import funcionalidad.excepciones.FechaNoValidaException;
 
 import java.io.Serializable;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Locale;
 
 /**
- * Clase padre de todas las ventanas de tipo JDialog
+ * Clase padre de todas las ventanas de tipo JDialog de la GUI
  * 
- * @author Guillermo Boquizo Sánchez
- * @version 1.0
+ * @author Guillermo Boquizo Sanchez
+ * @version 2.0
  *
  */
 public class FechasGUI extends JDialog implements Serializable {
@@ -65,20 +64,11 @@ public class FechasGUI extends JDialog implements Serializable {
 	JPanel buttonPane;
 	JButton buttonSalir;
 
-	static {
-		Locale.setDefault(new Locale("es", "ES"));
-	}
-
 	/**
 	 * Create the dialog.
 	 */
 	public FechasGUI() {
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent arg0) {
-				annadir();
-			}
-		});
+		controlarSalida();
 		setTitle("Fechas");
 		setResizable(false);
 		setModal(true);
@@ -107,11 +97,10 @@ public class FechasGUI extends JDialog implements Serializable {
 		contentPanel.add(txtfldTiempoTranscurrido);
 		txtfldTiempoTranscurrido.setColumns(10);
 
-		
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.WHITE);
-		panel.setToolTipText("Escoge una fecha");
-		panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Fecha",
+		panel.setToolTipText("Escoge un formato de fecha");
+		panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Formato",
 				TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panel.setBounds(10, 157, 243, 45);
 		contentPanel.add(panel);
@@ -121,7 +110,7 @@ public class FechasGUI extends JDialog implements Serializable {
 			rdbtnDia.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					actualizarSeleccion();
-					modificado = true;
+					setModificado(true);
 				}
 			});
 			rdbtnDia.setToolTipText("Permite escoger d\u00EDas");
@@ -138,7 +127,7 @@ public class FechasGUI extends JDialog implements Serializable {
 			rdbtnMeses.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					actualizarSeleccion();
-					modificado = true;
+					setModificado(true);
 				}
 			});
 			rdbtnMeses.setToolTipText("Permite escoger meses");
@@ -154,7 +143,7 @@ public class FechasGUI extends JDialog implements Serializable {
 			rdbtnAnnos.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					actualizarSeleccion();
-					modificado = false;
+					setModificado(false);
 				}
 			});
 			rdbtnAnnos.setToolTipText("Permite escoger a\u00F1os");
@@ -166,16 +155,15 @@ public class FechasGUI extends JDialog implements Serializable {
 			buttonGroup.add(rdbtnAnnos);
 		}
 
-		
-
 		spinnerInicial = new JSpinner();
+		spinnerInicial.setLocale(new Locale("es", "ES"));
 		spinnerInicial.setForeground(Color.WHITE);
 		spinnerInicial.setBackground(Color.DARK_GRAY);
 		spinnerInicial.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				try {
 					isFechaValida();
-					modificado = true;
+					setModificado(true);
 					actualizarSeleccion();
 				} catch (HeadlessException | FechaNoValidaException e) {
 					e.getMessage();
@@ -188,14 +176,15 @@ public class FechasGUI extends JDialog implements Serializable {
 		contentPanel.add(spinnerInicial);
 
 		spinnerFinal = new JSpinner();
+		spinnerFinal.setLocale(new Locale("es", "ES"));
 		spinnerFinal.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
+			public void stateChanged(ChangeEvent arg) {
 				try {
 					isFechaValida();
-					modificado = true;
+					setModificado(true);
 					actualizarSeleccion();
-				} catch (HeadlessException | FechaNoValidaException | DateTimeException e1) {
-					e1.getMessage();
+				} catch ( FechaNoValidaException e) {
+					e.getMessage();
 				}
 
 			}
@@ -230,20 +219,38 @@ public class FechasGUI extends JDialog implements Serializable {
 		txtfldTiempoTranscurrido.setText(obtenerPeriodoAnnos(getFechaSpinnerInicial(), getFechaSpinnerFinal()));
 	}
 
+	/**
+	 * Metodo encargado de controlar la salida estandar del dialogo
+	 */
+	private void controlarSalida() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				annadir();
+				dispose();
+			}
+		});
+	}
 
+	/**
+	 * Metodo encargado de establecer los valores iniciales del JSpinner de
+	 * Fecha Final
+	 */
+	private void setSpinnerInicial() {
+		spinnerInicial.setModel(new SpinnerDateModel(new Date(1497045600000L), null, null, Calendar.YEAR));
+		spinnerInicial.setEditor(new JSpinner.DateEditor(spinnerInicial, "dd 'de' MMMM 'de' yyyy', 'EEEE"));
+	}
+
+	/**
+	 * Metodo encargado de establecer los valores iniciales del JSpinner de
+	 * Fecha Final
+	 */
 	private void setSpinnerFinal() {
 		fechaFin = LocalDate.of(FECHA_ACTUAL.plusYears(3).getYear(), FECHA_ACTUAL.getMonth(),
 				FECHA_ACTUAL.getDayOfMonth());
 		spinnerFinal.setModel(new SpinnerDateModel(java.sql.Date.valueOf(fechaFin), null, null, Calendar.MONTH));
 		spinnerFinal.setEditor(new JSpinner.DateEditor(spinnerFinal, "dd 'de' MMMM 'de' yyyy', 'EEEE"));
 	}
-
-
-	private void setSpinnerInicial() {
-		spinnerInicial.setModel(new SpinnerDateModel(java.sql.Date.valueOf(FECHA_ACTUAL), null, null, Calendar.MONTH));
-		spinnerInicial.setEditor(new JSpinner.DateEditor(spinnerInicial, "dd 'de' MMMM 'de' yyyy', 'EEEE"));
-	}
-
 
 	/**
 	 * Metodo que permite obtener la fecha del spinner inicial
@@ -254,8 +261,8 @@ public class FechasGUI extends JDialog implements Serializable {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime((Date) spinnerInicial.getModel().getValue());
 		LocalDate fecha = null;
-			fecha = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-					calendar.get(Calendar.DAY_OF_MONTH));
+		fecha = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
+				calendar.get(Calendar.DAY_OF_MONTH));
 		return fecha;
 	}
 
@@ -267,13 +274,13 @@ public class FechasGUI extends JDialog implements Serializable {
 	public static LocalDate getFechaSpinnerFinal() {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime((Date) spinnerFinal.getModel().getValue());
-		LocalDate fecha = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+		LocalDate fecha = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
 				calendar.get(Calendar.DAY_OF_MONTH));
 		return fecha;
 	}
 
 	/**
-	 * Controla la selección de los radioButtons en dias, meses y annos
+	 * Controla la seleccion de los radioButtons en dias, meses y annos
 	 * 
 	 * @param spinnerInicial
 	 *            el JSpinner para la fecha inicial
@@ -282,25 +289,25 @@ public class FechasGUI extends JDialog implements Serializable {
 	 * 
 	 */
 	private void actualizarSeleccion() {
-		
-			if (rdbtnAnnos.isSelected()) {
 
-				txtfldTiempoTranscurrido.setText(obtenerPeriodoAnnos(getFechaSpinnerInicial(), getFechaSpinnerFinal()));
+		if (rdbtnAnnos.isSelected()) {
 
-			} else if (rdbtnMeses.isSelected()) {
-				txtfldTiempoTranscurrido.setText(obtenerPeriodoMeses(getFechaSpinnerInicial(), getFechaSpinnerFinal()));
-			} else
-				txtfldTiempoTranscurrido.setText(obtenerPeriodoDias(getFechaSpinnerInicial(), getFechaSpinnerFinal()));
+			txtfldTiempoTranscurrido.setText(obtenerPeriodoAnnos(getFechaSpinnerInicial(), getFechaSpinnerFinal()));
+
+		} else if (rdbtnMeses.isSelected()) {
+			txtfldTiempoTranscurrido.setText(obtenerPeriodoMeses(getFechaSpinnerInicial(), getFechaSpinnerFinal()));
+		} else
+			txtfldTiempoTranscurrido.setText(obtenerPeriodoDias(getFechaSpinnerInicial(), getFechaSpinnerFinal()));
 	}
 
 	/**
-	 * Método que permite obtener un período en dias
+	 * Metodo que permite obtener un periodo en dias
 	 * 
 	 * @param fechaInicial
 	 *            la fecha inicial, de tipo LocalDate
 	 * @param fechaFinal,
 	 *            la fecha inicial, de tipo LocalDate
-	 * @return la fecha en días, pasada a cadena
+	 * @return la fecha en dias, pasada a cadena
 	 */
 	private String obtenerPeriodoDias(LocalDate fechaInicial, LocalDate fechaFinal) {
 		long dias = ChronoUnit.DAYS.between(fechaInicial, fechaFinal);
@@ -340,11 +347,10 @@ public class FechasGUI extends JDialog implements Serializable {
 	 * que la fecha inicial. Si lo es, lanza un error y resetea los valores de
 	 * los JSpinner a sus valores por defecto
 	 * 
-	 * @throws HeadlessException
 	 * @throws FechaNoValidaException
 	 */
-	private void isFechaValida() throws HeadlessException, FechaNoValidaException {
-		if (getFechaSpinnerFinal().isBefore (getFechaSpinnerInicial())) {
+	private void isFechaValida() throws FechaNoValidaException {
+		if (getFechaSpinnerFinal().isBefore(getFechaSpinnerInicial())) {
 			JOptionPane.showMessageDialog(contentPanel, "Error, la fecha no es válida", "Error en la fecha",
 					JOptionPane.ERROR_MESSAGE);
 			resetearSpinners();
@@ -357,10 +363,10 @@ public class FechasGUI extends JDialog implements Serializable {
 	 * que sale
 	 */
 	private void annadir() {
-		
-		Gestion.add(getFechaSpinnerInicial(), getFechaSpinnerFinal(),txtfldTiempoTranscurrido.getText());
+
+		Gestion.add(getFechaSpinnerInicial(), getFechaSpinnerFinal(), txtfldTiempoTranscurrido.getText());
 		JOptionPane.showMessageDialog(contentPanel, "Fecha añadida correctamente");
-		dispose();
+		
 	}
 
 	/**
@@ -388,13 +394,12 @@ public class FechasGUI extends JDialog implements Serializable {
 	 * @param modificado,
 	 *            el campo modificado pasado como parámetro
 	 */
-	public static void setModificado(boolean modificado) {
+	private void setModificado(boolean modificado) {
 		FechasGUI.modificado = modificado;
 	}
-	
-	
+
 	/**
-	 * Metodo que establece los valores predeterminados del JSpinner para las
+	 * Metodo que establece los valores predeterminados de ambos JSpinner para las
 	 * fechas iniciales
 	 */
 	void resetearSpinners() {

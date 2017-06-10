@@ -11,15 +11,12 @@ import javax.swing.border.EmptyBorder;
 /**
  * Clase que gestiona la GUI de ChronoUnit
  * 
- * @author Guillermo Boquizo Sánchez
- * @version 1.0
+ * @author Guillermo Boquizo Sanchez
+ * @version 2.0
  *
  */
 public class ChronoUnitGUI extends FechasGUI {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 
@@ -39,7 +36,5 @@ public class ChronoUnitGUI extends FechasGUI {
 		contentPanel.setBackground(java.awt.Color.WHITE);
 		contentPanel.setLayout(new FlowLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-
 	}
-
 }

@@ -14,8 +14,8 @@ import java.awt.Color;
 /**
  * Clase para la ventana GUI AcercaDe
  * 
- * @author Guillermo Boquizo Sánchez
- * @version 1.0
+ * @author Guillermo Boquizo Sanchez
+ * @version 2.0
  *
  */
 public class AcercaDe extends JDialog {
@@ -49,7 +49,7 @@ public class AcercaDe extends JDialog {
 		lblAcercaDe.setHorizontalAlignment(SwingConstants.CENTER);
 
 		JLabel lblimagen = new JLabel("");
-		lblimagen.setToolTipText("Gif Animado insertado en un JLabel");
+		lblimagen.setToolTipText("Gif animado insertado en un JLabel");
 		lblimagen.setForeground(Color.WHITE);
 		lblimagen.setBounds(29, 249, 213, 220);
 		getContentPane().add(lblimagen);

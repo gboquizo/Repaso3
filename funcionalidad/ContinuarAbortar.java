@@ -2,11 +2,11 @@ package funcionalidad;
 
 public enum ContinuarAbortar {
 	/**
-	 * Continúa con la acción
+	 * Continua con la accion
 	 */
 	CONTINUAR,
 	/**
-	 * Aborta la acción
+	 * Aborta la accion
 	 */
 	ABORTAR
 }

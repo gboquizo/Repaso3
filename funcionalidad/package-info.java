@@ -2,7 +2,7 @@
  * 
  */
 /**
- * @author Guillermo Boquizo Sánchez
+ * @author Guillermo Boquizo Sanchez
  * @version 1.0
  *
  */

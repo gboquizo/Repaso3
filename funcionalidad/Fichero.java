@@ -10,10 +10,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import funcionalidad.excepciones.ErrorAlEscribirException;
+import funcionalidad.excepciones.ErrorAlLeerException;
+
 /**
  * Clase de control de ficheros
  * 
- * @author Guillermo Boquizo Sánchez
+ * @author Guillermo Boquizo Sanchez
  * @version 2.0
  *
  */
@@ -64,10 +67,10 @@ public class Fichero implements Serializable {
 	}
 
 	/**
-	 * Añade la extensión txt sólo en caso de ser necesario
+	 * Añade la extension txt solo en caso de ser necesario
 	 * 
-	 * @param file
-	 * @return Fichero con la extensión ".txt"
+	 * @param file, el fichero al que se le agrega
+	 * @return Fichero con la extension ".txt"
 	 */
 	private static File annadirExtension(File file) {
 
